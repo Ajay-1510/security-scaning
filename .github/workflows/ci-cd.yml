@@ -1,0 +1,36 @@
+on:
+  push:
+    branches:
+      - main
+      jobs:
+  build:
+    runs-on: ubuntu-latest
+        steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+              - name: Run unit tests
+        run: npm test
+
+      - name: SonarQube Static Analysis
+        uses: SonarSource/sonarqube-scan-action@v2
+
+      - name: Trivy Container Security Scan
+        run: |
+          docker build -t myapp .
+          trivy image myapp
+                - name: Build Docker image
+        run: docker build -t myapp .
+
+      - name: Push to Docker Hub
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker tag myapp myrepo/myapp:latest
+          docker push myrepo/myapp:latest
